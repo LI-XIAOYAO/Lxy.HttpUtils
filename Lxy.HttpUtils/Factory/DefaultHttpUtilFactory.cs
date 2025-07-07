@@ -107,10 +107,11 @@ namespace Lxy.HttpUtils
                                             {
                                                 Debug.WriteLine($"[{item.Key}] {ex.Message}", nameof(HttpUtilFactoryActiveHandler));
                                             }
-#endif
-                                            finally
+#else
+                                            catch
                                             {
                                             }
+#endif
 
 #if DEBUG
                                             Debug.WriteLine($"[{item.Key}] removed", nameof(HttpUtilFactoryActiveHandler));

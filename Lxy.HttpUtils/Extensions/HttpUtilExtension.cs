@@ -78,16 +78,6 @@ namespace Lxy.HttpUtils
         }
 
         /// <summary>
-        /// Get HttpUtil by <see cref="Uri.Host"/>.
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public static IHttpUtil GetHttpUtil(this Uri uri)
-        {
-            return _defaultHttpUtilFactory.Get(uri.RelativeUri().Host);
-        }
-
-        /// <summary>
         /// Get HttpUtil by specified name.
         /// </summary>
         /// <param name="name"></param>
@@ -101,15 +91,19 @@ namespace Lxy.HttpUtils
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (config is null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-
-            var httpUtilConfig = DefaultHttpUtilFactory.HttpUtilConfigs.GetOrAdd(name, (HttpUtilConfig)DefaultHttpUtilFactory.HttpUtilConfig.Clone());
-            config(httpUtilConfig);
+            name.SetConfig(config);
 
             return _defaultHttpUtilFactory.Get(name);
+        }
+
+        /// <summary>
+        /// Get HttpUtil by <see cref="Uri.Host"/>.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static IHttpUtil GetHttpUtil(this Uri uri)
+        {
+            return GetHttpUtil(uri.RelativeUri().Host, config => config.BaseAddress = uri);
         }
 
         /// <summary>
@@ -126,7 +120,9 @@ namespace Lxy.HttpUtils
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return GetHttpUtil(uri.RelativeUri().Host, config);
+            Action<HttpUtilConfig> defaultConfig = c => c.BaseAddress = uri;
+
+            return GetHttpUtil(uri.RelativeUri().Host, defaultConfig += config);
         }
 
         /// <summary>
