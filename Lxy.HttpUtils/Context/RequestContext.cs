@@ -150,7 +150,7 @@ namespace Lxy.HttpUtils
                     throw new ArgumentNullException(nameof(querys));
                 }
 
-                return $"{c.Key}={c.Value}";
+                return $"{c.Key}={(isEscape ? HttpUtility.UrlEncode(c.Value?.ToString()) : c.Value)}";
             })), isEscape);
 
             return this;
