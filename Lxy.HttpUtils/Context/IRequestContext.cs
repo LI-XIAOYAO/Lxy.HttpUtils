@@ -60,10 +60,9 @@ namespace Lxy.HttpUtils
         /// Adds a query string.
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="isEscape"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        IRequestContext AddQuery(string query, bool isEscape = true);
+        IRequestContext AddQuery(string query);
 
         /// <summary>
         /// Adds cookie to <see cref="CookieContainer"/>.

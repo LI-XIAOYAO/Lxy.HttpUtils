@@ -12,7 +12,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Lxy.HttpUtils
 {
@@ -52,7 +51,8 @@ namespace Lxy.HttpUtils
         private int _retryCount;
         private Func<int, int> _retryPolicy;
         private RetryOptions _retryOptions;
-        private Uri Uri => _uri.IsAbsoluteUri || null == _httpUtilConfig.BaseAddress ? _uri : new Uri(_httpUtilConfig.BaseAddress, _uri);
+
+        private Uri Uri => _uri.IsAbsoluteUri ? _uri : new Uri(_httpClient.BaseAddress, _uri);
 
         public CookieContainer CookieContainer => _httpMessageHandler.CookieContainer;
 
@@ -150,21 +150,47 @@ namespace Lxy.HttpUtils
                     throw new ArgumentNullException(nameof(querys));
                 }
 
-                return $"{c.Key}={(isEscape ? HttpUtility.UrlEncode(c.Value?.ToString()) : c.Value)}";
-            })), isEscape);
+                return $"{c.Key}={(null != c.Value && isEscape ? Uri.EscapeDataString(c.Value.ToString()) : c.Value)}";
+            })));
 
             return this;
         }
 
-        public IRequestContext AddQuery(string query, bool isEscape = true)
+        public IRequestContext AddQuery(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
                 throw new ArgumentException(nameof(query));
             }
 
-            var queryString = $"{(query.StartsWith("&") || query.StartsWith("?") ? string.Empty : new UriBuilder(_uri.IsAbsoluteUri ? _uri : new Uri(_httpClient.BaseAddress, _uri)).Query.Length > 0 ? "&" : "?")}{query}";
-            _uri = new Uri($"{_uri.OriginalString}{(isEscape ? HttpUtility.UrlPathEncode(queryString) : queryString)}", UriKind.RelativeOrAbsolute);
+            switch (Uri.Query.Length)
+            {
+                case 0:
+                    if ('?' != query[0])
+                    {
+                        query = "?" + query;
+                    }
+
+                    break;
+
+                case 1:
+                    if ('?' == query[0])
+                    {
+                        query = query.Substring(1);
+                    }
+
+                    break;
+
+                default:
+                    if ('&' != query[0])
+                    {
+                        query = "&" + query;
+                    }
+
+                    break;
+            }
+
+            _uri = new Uri($"{_uri.OriginalString}{query}", UriKind.RelativeOrAbsolute);
 
             return this;
         }

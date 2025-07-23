@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<VersionPrefix>1.0.2</VersionPrefix>
+		<VersionPrefix>1.0.3</VersionPrefix>
 		<Authors>Lxy</Authors>
 		<Description>HttpClient FluentAPI extension.</Description>
 		<PackageTags>HttpClient;FluentAPI</PackageTags>

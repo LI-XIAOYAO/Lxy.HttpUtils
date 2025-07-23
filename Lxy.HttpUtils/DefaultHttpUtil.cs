@@ -59,6 +59,11 @@ namespace Lxy.HttpUtils
                 throw new ObjectDisposedException(typeof(IHttpUtil).FullName);
             }
 
+            if (!uri.IsAbsoluteUri && null == _httpClient.BaseAddress)
+            {
+                throw new ArgumentException($"The URI '{uri}' must be absolute or the HttpUtilConfig BaseAddress must be set.", nameof(uri));
+            }
+
             return new RequestContext(_httpClient, _httpMessageHandler, _httpUtilConfig, uri, httpMethod, PendingCounter);
         }
 
