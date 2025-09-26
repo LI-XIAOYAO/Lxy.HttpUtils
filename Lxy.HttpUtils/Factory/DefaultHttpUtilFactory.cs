@@ -21,7 +21,6 @@ namespace Lxy.HttpUtils
 
         static DefaultHttpUtilFactory()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             HttpUtilFactoryActiveHandler();
         }
 

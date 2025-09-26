@@ -38,7 +38,7 @@ namespace Lxy.HttpUtils
                 throw new ArgumentNullException(nameof(config));
             }
 
-            var httpUtilConfig = DefaultHttpUtilFactory.HttpUtilConfigs.GetOrAdd(name, (HttpUtilConfig)DefaultHttpUtilFactory.HttpUtilConfig.Clone());
+            var httpUtilConfig = DefaultHttpUtilFactory.HttpUtilConfigs.GetOrAdd(name, c => new HttpUtilConfig());
             config(httpUtilConfig);
         }
 

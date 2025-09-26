@@ -11,7 +11,7 @@ namespace Lxy.HttpUtils
     /// <summary>
     /// HttpUtilConfig should be configured before calling or after disposed.
     /// </summary>
-    public sealed class HttpUtilConfig : ICloneable
+    public sealed class HttpUtilConfig
     {
         private TimeSpan? _autoDisposed = TimeSpan.FromMinutes(30);
         private TimeSpan _timeout = TimeSpan.FromSeconds(100);
@@ -186,13 +186,11 @@ namespace Lxy.HttpUtils
 
                 SetDefaultRequestHeaders(c =>
                 {
-                    if (string.IsNullOrWhiteSpace(value))
+                    c.UserAgent.Clear();
+
+                    if (!string.IsNullOrWhiteSpace(value))
                     {
-                        c.UserAgent.Clear();
-                    }
-                    else
-                    {
-                        c.UserAgent.ParseAdd(value);
+                        c.TryAddWithoutValidation("User-Agent", value);
                     }
                 });
             }
@@ -435,41 +433,6 @@ namespace Lxy.HttpUtils
             CookieContainer.Add(cookies);
 
             return this;
-        }
-
-        /// <summary>
-        /// Clone
-        /// </summary>
-        /// <returns></returns>
-        public object Clone()
-        {
-            return new HttpUtilConfig
-            {
-                AutoDisposed = AutoDisposed,
-                Timeout = Timeout,
-                RetryCount = RetryCount,
-                RetryPolicyFunc = null != RetryPolicyFunc ? (Func<int, int>)RetryPolicyFunc.Clone() : null,
-                Authorization = Authorization,
-                BaseAddress = BaseAddress,
-                ContentType = ContentType,
-                ContentTypeHeaderValue = MediaTypeHeaderValue.Parse(_contentType),
-                CookieContainer = CookieContainer,
-                DefaultRequestHeadersAction = null != DefaultRequestHeadersAction ? (Action<HttpRequestHeaders>)DefaultRequestHeadersAction.Clone() : null,
-                Encoding = Encoding,
-                EnsureSuccessStatusCode = EnsureSuccessStatusCode,
-#if NET7_0_OR_GREATER
-
-                HttpMessageHandlerAction = null != HttpMessageHandlerAction ? (Action<SocketsHttpHandler>)HttpMessageHandlerAction.Clone() : null,
-
-#else
-
-                HttpMessageHandlerAction = null != HttpMessageHandlerAction ? (Action<HttpClientHandler>)HttpMessageHandlerAction.Clone() : null,
-
-#endif
-                JsonSerializerSettings = null != JsonSerializerSettings ? new JsonSerializerSettings(JsonSerializerSettings) : null,
-                MaxResponseContentBufferSize = MaxResponseContentBufferSize,
-                UserAgent = UserAgent
-            };
         }
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -57,7 +56,7 @@ namespace Lxy.HttpUtils.Tests
             var httpUtilFactory = Services.GetRequiredService<IHttpUtilFactory>();
             using var testApi = httpUtilFactory.Get("TestApi");
             var getQuery = await testApi.Get("test/get-query?id=1&name=2").ReadAsAsync<string[]>();
-            
+
             Assert.Equal(2, getQuery.Length);
             Assert.Equal<string[]>(getQuery, ["1", "2"]);
 

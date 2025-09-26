@@ -256,7 +256,7 @@ namespace Lxy.HttpUtils
             _httpRequestMessageAction += c =>
             {
                 c.Headers.UserAgent.Clear();
-                c.Headers.UserAgent.ParseAdd(userAgent);
+                c.Headers.TryAddWithoutValidation("User-Agent", userAgent);
             };
 
             return this;
@@ -271,6 +271,18 @@ namespace Lxy.HttpUtils
 
             var authentication = new AuthenticationHeaderValue(scheme, parameter);
             _httpRequestMessageAction += c => c.Headers.Authorization = authentication;
+
+            return this;
+        }
+
+        public IRequestContext SetReferer(string referer)
+        {
+            if (!Uri.TryCreate(referer, UriKind.Absolute, out var uri))
+            {
+                throw new ArgumentException(nameof(referer));
+            }
+
+            _httpRequestMessageAction += c => c.Headers.Referrer = uri;
 
             return this;
         }
@@ -475,8 +487,8 @@ namespace Lxy.HttpUtils
                             foreach (var item in str.Split('&'))
                             {
                                 var index = item.IndexOf('=');
-                                var span = item.AsSpan();
-                                keyValuePairs[span.Slice(0, index).ToString()] = span.Slice(index + 1).ToString();
+
+                                keyValuePairs[item.Substring(0, index)] = item.Substring(index + 1);
                             }
                         }
                         catch
@@ -502,7 +514,14 @@ namespace Lxy.HttpUtils
                         break;
 
                     default:
-                        throw new ArgumentException(nameof(content));
+                        keyValuePairs = new Dictionary<string, string>();
+
+                        foreach (var property in content.GetType().GetProperties())
+                        {
+                            keyValuePairs[property.Name] = property.GetValue(content)?.ToString();
+                        }
+
+                        break;
                 }
 
                 return SetContentType(new FormUrlEncodedContent(keyValuePairs), contentType);

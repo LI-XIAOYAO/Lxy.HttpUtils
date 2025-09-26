@@ -115,6 +115,13 @@ namespace Lxy.HttpUtils
         IRequestContext SetAuthorization(string scheme, string parameter);
 
         /// <summary>
+        /// Sets the value of the Referer header for HTTP request.
+        /// </summary>
+        /// <param name="referer"></param>
+        /// <returns></returns>
+        IRequestContext SetReferer(string referer);
+
+        /// <summary>
         /// Sets the content of the HTTP message.
         /// </summary>
         /// <param name="content"></param>
