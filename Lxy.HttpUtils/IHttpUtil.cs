@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 
 namespace Lxy.HttpUtils
@@ -8,6 +9,11 @@ namespace Lxy.HttpUtils
     /// </summary>
     public interface IHttpUtil : IDisposable
     {
+        /// <summary>
+        /// Gets the managed cookie container object.
+        /// </summary>
+        CookieContainer CookieContainer { get; }
+
         /// <summary>
         /// Send a <see cref="HttpMethod"/> request to the specified Uri.
         /// </summary>

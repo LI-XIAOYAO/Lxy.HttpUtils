@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 
@@ -22,7 +23,9 @@ namespace Lxy.HttpUtils
         private readonly HttpClient _httpClient;
         private readonly HttpUtilConfig _httpUtilConfig;
         private bool _disposed;
+
         public PendingCounter PendingCounter { get; } = new PendingCounter();
+        public CookieContainer CookieContainer => _httpMessageHandler.CookieContainer;
 
         public event EventHandler OnDisposed;
 
