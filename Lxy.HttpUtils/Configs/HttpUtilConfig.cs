@@ -17,6 +17,7 @@ namespace Lxy.HttpUtils
         private TimeSpan _timeout = TimeSpan.FromSeconds(100);
         private int _maxResponseContentBufferSize = int.MaxValue;
         private CookieContainer _cookieContainer = new CookieContainer();
+        private Uri _baseAddress;
         private string _userAgent;
         private string _authorization;
         private string _contentType = "application/json";
@@ -139,7 +140,29 @@ namespace Lxy.HttpUtils
         /// <summary>
         /// <inheritdoc cref="HttpClient.BaseAddress"/>
         /// </summary>
-        public Uri BaseAddress { get; set; }
+        public Uri BaseAddress
+        {
+            get => _baseAddress;
+            set
+            {
+                if (null != _baseAddress)
+                {
+                    throw new ArgumentException("BaseAddress can only be set once.", nameof(BaseAddress));
+                }
+
+                if (null == value)
+                {
+                    throw new ArgumentNullException(nameof(BaseAddress));
+                }
+
+                if (!value.IsAbsoluteUri)
+                {
+                    throw new ArgumentException("The URI must be absolute.", nameof(BaseAddress));
+                }
+
+                _baseAddress = value;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc cref="HttpResponseMessage.EnsureSuccessStatusCode()"/>
@@ -433,6 +456,52 @@ namespace Lxy.HttpUtils
             CookieContainer.Add(cookies);
 
             return this;
+        }
+
+        /// <summary>
+        /// Clone
+        /// </summary>
+        /// <returns></returns>
+        public HttpUtilConfig Clone()
+        {
+            var httpUtilConfig = new HttpUtilConfig
+            {
+                AutoDisposed = AutoDisposed,
+                Timeout = Timeout,
+                RetryCount = RetryCount,
+                RetryPolicyFunc = null != RetryPolicyFunc ? (Func<int, int>)RetryPolicyFunc.Clone() : null,
+                Authorization = Authorization,
+                ContentType = ContentType,
+                ContentTypeHeaderValue = MediaTypeHeaderValue.Parse(_contentType),
+                CookieContainer = CookieContainer,
+                DefaultRequestHeadersAction = null != DefaultRequestHeadersAction ? (Action<HttpRequestHeaders>)DefaultRequestHeadersAction.Clone() : null,
+                Encoding = Encoding,
+                EnsureSuccessStatusCode = EnsureSuccessStatusCode,
+
+#if NET7_0_OR_GREATER
+
+                HttpMessageHandlerAction = null != HttpMessageHandlerAction ? (Action<SocketsHttpHandler>)HttpMessageHandlerAction.Clone() : null,
+                DefaultVersionPolicy = DefaultVersionPolicy,
+
+#else
+
+                HttpMessageHandlerAction = null != HttpMessageHandlerAction ? (Action<HttpClientHandler>)HttpMessageHandlerAction.Clone() : null,
+
+#endif
+
+                JsonSerializerSettings = null != JsonSerializerSettings ? new JsonSerializerSettings(JsonSerializerSettings) : null,
+                MaxResponseContentBufferSize = MaxResponseContentBufferSize,
+                UserAgent = UserAgent,
+                DefaultRequestVersion = DefaultRequestVersion,
+                RetryOptions = RetryOptions
+            };
+
+            if (null != BaseAddress)
+            {
+                httpUtilConfig.BaseAddress = BaseAddress;
+            }
+
+            return httpUtilConfig;
         }
     }
 }

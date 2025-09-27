@@ -25,10 +25,13 @@ namespace Lxy.HttpUtils.Tests
         {
             HttpUtil.SetConfig(config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
-            using var responseContext = await "test/check".Get().SendAsync();
+            using var responseContext = await "test/check/".Get().SendAsync();
 
             Assert.True(responseContext.IsSuccessStatusCode);
         }
@@ -38,7 +41,10 @@ namespace Lxy.HttpUtils.Tests
         {
             HttpUtil.SetConfig("TestApi", config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             using var httpUtil = "TestApi".GetHttpUtil();
@@ -52,7 +58,10 @@ namespace Lxy.HttpUtils.Tests
         {
             HttpUtil.SetConfig(new Uri("https://localhost:5200"), config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             using var httpUtil = "localhost".GetHttpUtil();
@@ -85,7 +94,11 @@ namespace Lxy.HttpUtils.Tests
 
             using var httpUtil = "TestApi".GetHttpUtil(config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
+
                 config.SetRetry(3, d => (int)(Math.Pow(2, d - 1) * 1000)); // 1 2 4 8 16s...
             });
 
@@ -140,7 +153,10 @@ namespace Lxy.HttpUtils.Tests
         {
             HttpUtil.SetConfig(config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             using var httpUtil = HttpUtil.GetHttpUtil();
@@ -160,7 +176,10 @@ namespace Lxy.HttpUtils.Tests
         {
             HttpUtil.SetConfig(new Uri("https://localhost:5200"), config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             using var httpUtil = new Uri("https://localhost:5200").GetHttpUtil();
@@ -176,7 +195,10 @@ namespace Lxy.HttpUtils.Tests
 
             HttpUtil.SetConfig(new Uri("https://localhost:5200"), config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             var token = Guid.NewGuid().ToString();
@@ -199,7 +221,10 @@ namespace Lxy.HttpUtils.Tests
 
             HttpUtil.SetConfig(new Uri("https://localhost:5200"), config =>
             {
-                config.BaseAddress = new Uri("https://localhost:5200");
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = new Uri("https://localhost:5200");
+                }
             });
 
             var token = Guid.NewGuid().ToString();

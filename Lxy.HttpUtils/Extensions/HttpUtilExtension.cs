@@ -91,7 +91,13 @@ namespace Lxy.HttpUtils
                 throw new ArgumentNullException(nameof(name));
             }
 
-            name.SetConfig(config);
+            if (config is null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            var httpUtilConfig = DefaultHttpUtilFactory.HttpUtilConfigs.GetOrAdd(name, c => DefaultHttpUtilFactory.HttpUtilConfig.Clone());
+            config(httpUtilConfig);
 
             return _defaultHttpUtilFactory.Get(name);
         }
@@ -103,7 +109,15 @@ namespace Lxy.HttpUtils
         /// <returns></returns>
         public static IHttpUtil GetHttpUtil(this Uri uri)
         {
-            return GetHttpUtil(uri.RelativeUri().Host, config => config.BaseAddress = uri);
+            var relativeUri = uri.RelativeUri();
+
+            return GetHttpUtil(relativeUri.Host, config =>
+            {
+                if (null == config.BaseAddress)
+                {
+                    config.BaseAddress = relativeUri.AuthorityUri();
+                }
+            });
         }
 
         /// <summary>
@@ -120,9 +134,17 @@ namespace Lxy.HttpUtils
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            Action<HttpUtilConfig> defaultConfig = c => c.BaseAddress = uri;
+            var relativeUri = uri.RelativeUri();
 
-            return GetHttpUtil(uri.RelativeUri().Host, defaultConfig += config);
+            Action<HttpUtilConfig> defaultConfig = c =>
+            {
+                if (null == c.BaseAddress)
+                {
+                    c.BaseAddress = relativeUri.AuthorityUri();
+                }
+            };
+
+            return GetHttpUtil(relativeUri.Host, defaultConfig += config);
         }
 
         /// <summary>
@@ -368,6 +390,16 @@ namespace Lxy.HttpUtils
             }
 
             return uri;
+        }
+
+        /// <summary>
+        /// AuthorityUri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        private static Uri AuthorityUri(this Uri uri)
+        {
+            return new Uri($"{uri.Scheme}{Uri.SchemeDelimiter}{uri.Authority}");
         }
 
         /// <summary>
