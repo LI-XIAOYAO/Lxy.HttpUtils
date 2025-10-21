@@ -18,12 +18,12 @@ namespace Lxy.HttpUtils
         public Func<string, string> Replacer { get; set; }
 
         /// <summary>
-        /// Content stream reader, If null value is returned it will be skipped.
+        /// Content stream reader.
         /// </summary>
         /// <param name="streamReader"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract ValueTask<string> Reader(StreamReader streamReader, CancellationToken cancellationToken);
+        public abstract ValueTask<string> ReadAsync(StreamReader streamReader, CancellationToken cancellationToken);
     }
 
 #endif

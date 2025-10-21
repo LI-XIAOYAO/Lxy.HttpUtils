@@ -27,7 +27,7 @@ namespace Lxy.HttpUtils
         /// <param name="streamReader"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async ValueTask<string> Reader(StreamReader streamReader, CancellationToken cancellationToken)
+        public override async ValueTask<string> ReadAsync(StreamReader streamReader, CancellationToken cancellationToken)
         {
             var data = await streamReader.ReadLineAsync(cancellationToken);
 

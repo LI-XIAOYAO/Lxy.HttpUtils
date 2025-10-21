@@ -23,10 +23,7 @@ namespace Lxy.HttpUtils
             get => _size;
             set
             {
-                if (value < 1)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
+                ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
 
                 _size = value;
                 _memory = new char[_size];
@@ -51,7 +48,7 @@ namespace Lxy.HttpUtils
         /// <param name="streamReader"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async ValueTask<string> Reader(StreamReader streamReader, CancellationToken cancellationToken)
+        public override async ValueTask<string> ReadAsync(StreamReader streamReader, CancellationToken cancellationToken)
         {
             var read = await streamReader.ReadBlockAsync(_memory, cancellationToken);
             if (0 == read)

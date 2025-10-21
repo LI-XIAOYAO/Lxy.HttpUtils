@@ -128,19 +128,18 @@ namespace Lxy.HttpUtils
 
             using var stream = await _httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
             var streamReader = new StreamReader(stream);
-
             var isString = typeof(T) == typeof(string);
 
             while (!streamReader.EndOfStream)
             {
-                dynamic data = await options.Reader(streamReader, cancellationToken);
+                var data = await options.ReadAsync(streamReader, cancellationToken);
 
                 if (null == data)
                 {
                     continue;
                 }
 
-                yield return isString ? (T)data : (T)JsonConvert.DeserializeObject<T>(data);
+                yield return isString ? (T)(object)data : JsonConvert.DeserializeObject<T>(data);
             }
         }
 
@@ -149,6 +148,16 @@ namespace Lxy.HttpUtils
             await foreach (var item in ReadStreamAsAsyncEnumerable<T>(new LineAsyncEnumerableOptions { IgnoreEmptyLines = true }, cancellationToken))
             {
                 yield return item;
+            }
+        }
+
+        public async IAsyncEnumerable<Memory<byte>> ReadStreamAsAsyncEnumerable(BytesAsyncEnumerableOptions options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using var stream = await _httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
+
+            await foreach (var bytes in (options ??= BytesAsyncEnumerableOptions.Default).ReaderBytesAsync(stream, cancellationToken))
+            {
+                yield return bytes;
             }
         }
 

@@ -673,12 +673,6 @@ namespace Lxy.HttpUtils
 
 #if NET7_0_OR_GREATER
 
-        /// <summary>
-        /// Reads the HTTP content and returns the value that results from deserializing the content as JSON in an async enumerable operation.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         public async IAsyncEnumerable<T> ReadAsAsyncEnumerable<T>([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await foreach (var item in (await SendAsync(cancellationToken)).ReadAsAsyncEnumerable<T>(cancellationToken))
@@ -687,13 +681,6 @@ namespace Lxy.HttpUtils
             }
         }
 
-        /// <summary>
-        /// Reads the HTTP content and returns the value that results from deserializing the content as JSON in an async enumerable operation.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="options"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         public async IAsyncEnumerable<T> ReadStreamAsAsyncEnumerable<T>(AsyncEnumerableOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -704,15 +691,17 @@ namespace Lxy.HttpUtils
             }
         }
 
-        /// <summary>
-        /// Reads the HTTP content and returns the value that results from deserializing the content as JSON in an async enumerable operation.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         public async IAsyncEnumerable<T> ReadStreamAsAsyncEnumerable<T>([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await foreach (var item in (await SendAsync(cancellationToken)).ReadStreamAsAsyncEnumerable<T>(cancellationToken))
+            {
+                yield return item;
+            }
+        }
+
+        public async IAsyncEnumerable<Memory<byte>> ReadStreamAsAsyncEnumerable(BytesAsyncEnumerableOptions options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            await foreach (var item in (await SendAsync(cancellationToken)).ReadStreamAsAsyncEnumerable(options, cancellationToken))
             {
                 yield return item;
             }
@@ -746,7 +735,16 @@ namespace Lxy.HttpUtils
 
         public override string ToString()
         {
-            using (var httpRequestMessage = new HttpRequestMessage(_httpMethod, Uri))
+            using (var httpRequestMessage = new HttpRequestMessage(_httpMethod, Uri)
+            {
+                Version = _version,
+
+#if NET7_0_OR_GREATER
+
+                VersionPolicy = _httpClient.DefaultVersionPolicy
+
+#endif
+            })
             {
                 _httpRequestMessageAction?.Invoke(httpRequestMessage);
 

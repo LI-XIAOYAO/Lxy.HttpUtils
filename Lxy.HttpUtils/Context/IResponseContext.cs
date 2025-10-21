@@ -125,6 +125,15 @@ namespace Lxy.HttpUtils
         /// <returns></returns>
         IAsyncEnumerable<T> ReadStreamAsAsyncEnumerable<T>(CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Reads a stream as an asynchronous enumerable of memory buffers.
+        /// </summary>
+        /// <param name="options">Optional configuration settings for reading the stream, such as buffer size or other parameters. If null,
+        /// default settings are used.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests. The operation is canceled if the token is triggered.</param>
+        /// <returns></returns>
+        IAsyncEnumerable<Memory<byte>> ReadStreamAsAsyncEnumerable(BytesAsyncEnumerableOptions options = null, CancellationToken cancellationToken = default);
+
 #endif
 
         /// <summary>
